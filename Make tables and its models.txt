@@ -1,0 +1,7 @@
+Make tables and its models.
+medical_store (name, license_no, address, phone, bottom content)
+medicines (Type, medicine_name)
+patient (id, name)
+bill (id,medical_store_id,patient_id,receipt_no, date)
+bill_detail (bill_id,medicine_id,quantity,unit_price,total_price)
+
