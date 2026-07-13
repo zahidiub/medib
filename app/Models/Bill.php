@@ -11,9 +11,9 @@ class Bill extends Model
 
     protected $fillable = [
         'medical_store_id',
-        'bill_number',
-        'patient_name',
-        'bill_date',
+        'patient_id',
+        'receipt_no',
+        'date',
     ];
 
     public function billDetails()
@@ -24,5 +24,15 @@ class Bill extends Model
     public function medicalStore()
     {
         return $this->belongsTo(MedicalStore::class);
+    }
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class);
+    }
+
+    public function grossTotal()
+    {
+        return $this->billDetails->sum('total_price');
     }
 }

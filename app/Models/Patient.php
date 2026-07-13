@@ -5,16 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MedicalStore extends Model
+class Patient extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'name',
-        'license_no',
-        'address',
-        'phone',
-        'bottom_content',
     ];
 
     public function bills()

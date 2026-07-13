@@ -10,10 +10,11 @@ class CreateMedicalStoresTable extends Migration
     {
         Schema::create('medical_stores', function (Blueprint $table) {
             $table->id();
-            $table->string('license_number')->unique();
             $table->string('name');
-            $table->string('address');
-            $table->string('phone_number');
+            $table->string('license_no')->nullable();
+            $table->string('address')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('bottom_content')->nullable();
             $table->timestamps();
         });
     }

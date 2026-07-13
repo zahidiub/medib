@@ -11,9 +11,9 @@ class CreateBillsTable extends Migration
         Schema::create('bills', function (Blueprint $table) {
             $table->id();
             $table->foreignId('medical_store_id')->constrained()->onDelete('cascade');
-            $table->string('bill_number');
-            $table->string('patient_name');
-            $table->date('bill_date');
+            $table->foreignId('patient_id')->constrained()->onDelete('cascade');
+            $table->string('receipt_no');
+            $table->date('date');
             $table->timestamps();
         });
     }

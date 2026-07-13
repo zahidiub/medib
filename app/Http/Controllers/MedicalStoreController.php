@@ -9,7 +9,7 @@ class MedicalStoreController extends Controller
 {
     public function index()
     {
-        $stores = MedicalStore::all();
+        $stores = MedicalStore::latest()->get();
         return view('medical_stores.index', compact('stores'));
     }
 
@@ -20,15 +20,9 @@ class MedicalStoreController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'license_number' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'name' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:15',
-        ]);
-
-        MedicalStore::create($request->all());
-        return redirect()->route('medical_stores.index')->with('success', 'Medical Store created successfully.');
+        $data = $this->validateData($request);
+        MedicalStore::create($data);
+        return redirect()->route('medical_stores.index')->with('success', 'Medical store created successfully.');
     }
 
     public function show(MedicalStore $medicalStore)
@@ -43,20 +37,25 @@ class MedicalStoreController extends Controller
 
     public function update(Request $request, MedicalStore $medicalStore)
     {
-        $request->validate([
-            'license_number' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'name' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:15',
-        ]);
-
-        $medicalStore->update($request->all());
-        return redirect()->route('medical_stores.index')->with('success', 'Medical Store updated successfully.');
+        $data = $this->validateData($request);
+        $medicalStore->update($data);
+        return redirect()->route('medical_stores.index')->with('success', 'Medical store updated successfully.');
     }
 
     public function destroy(MedicalStore $medicalStore)
     {
         $medicalStore->delete();
-        return redirect()->route('medical_stores.index')->with('success', 'Medical Store deleted successfully.');
+        return redirect()->route('medical_stores.index')->with('success', 'Medical store deleted successfully.');
+    }
+
+    private function validateData(Request $request)
+    {
+        return $request->validate([
+            'name' => 'required|string|max:255',
+            'license_no' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:255',
+            'bottom_content' => 'nullable|string',
+        ]);
     }
 }

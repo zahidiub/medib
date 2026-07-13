@@ -2,100 +2,118 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Bill;
 use Mike42\Escpos\Printer;
-use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 
 class ReceiptPrintController extends Controller
-{   
-public function print()
 {
-    try {
-        // Set your shared printer name here
-        // $printer_name = "BlackCopper"; // Change to your printer's shared name
-        // $connector = new WindowsPrintConnector($printer_name);
-        $connector = new \Mike42\Escpos\PrintConnectors\FilePrintConnector("/dev/usb/lp1"); // or your device path
-        $printer = new Printer($connector);
-
-
-        $printer->setJustification(Printer::JUSTIFY_CENTER);
-        $printer->setTextSize(2, 2); // Double size for store name
-        $printer->setEmphasis(true); // Bold
-        $printer->text("Green Plus Pharmacie\n");
-
-        $printer->setTextSize(1, 1); // Normal size for the rest
-        $printer->setEmphasis(false); // Unbold
-        $printer->text("Shop# 3, Chiragh Din Market\n");
-        $printer->text("Opp. Valencia Gate # 8, Defence Road, Lahore\n");
-        $printer->text("Phone # 0321-4638248 (JAZZ CASH) 0308-4005680\n");
-        $printer->text("License No: 05-352-0070-052414P\n\n");
-
-        // Details Section
-        $printer->setJustification(Printer::JUSTIFY_LEFT);
-        $printer->setEmphasis(true); // Bold for Sr. No and Date
-        $printer->text(" No: 259583    ");
-        $printer->setEmphasis(false); // Unbold for the rest
-        $printer->text("Date: 06/11/2025\n");
-         $printer->text("  M/S: Safia Begum\n\n");
-        
-        $printer->setJustification(Printer::JUSTIFY_CENTER);
-        // Table Headers (Bold)
-        $printer->setEmphasis(true); // Bold for table headers
-        $printer->text(str_pad("Item", 22));
-        $printer->text(str_pad("Qty", 7));
-        $printer->text(str_pad("Price", 8));
-        $printer->text("Total\n");
-        $printer->setEmphasis(false); // Unbold for table rows
-        $printer->text(str_repeat("-", 42) . "\n");
-
-        // Table Items
-        $printer->text("  Inj Toujeo 300IU       03  3253.30  9759.99\n");
-        $printer->text("  Inj Humulin R 100IU    02  1399.00  2798.00\n");
-        $printer->text("  ..10ML                                     \n");
-        $printer->text("  Inj Humulin N 100IU    02  1318.00  2636.00\n");
-        $printer->text("  ..10ML90                                   \n");
-        $printer->text("  Tab Linjardy MXR 5/25/ 60    28.60  1716.00\n");
-        $printer->text("  ..1000mg                                   \n");
-        $printer->text("  Tab Ucalo 2mg          60    30.00  1800.00\n");
-        $printer->text("  Tab Levopraid 50mg    120    46.51  5581.20\n");
-        $printer->text("  Tab Eziday DUO 5/50mg  60    17.50  1050.00\n");
-        $printer->text("  Accu-check (performa)  01  2747.00  2747.00\n");
-        $printer->text("  ..50's                                     \n");
-        $printer->text("  Tab Lochol EZ 10/10MG  60    18.99  1139.40\n");
-       
-        
-        $printer->text(str_repeat("-", 42) . "\n");
-        
-        // Totals Section (Bold for totals)
-        
-        $grossTotal = 29227.59;
-        $netTotal = 29227.59;
-        $discount = 0.00;
-
-        
-        $printer->setEmphasis(false); // Bold for totals
-        $printer->setJustification(Printer::JUSTIFY_RIGHT);
-        $printer->text("Gross Total:      " . str_pad(number_format($grossTotal, 2), 10, ' ', STR_PAD_LEFT) . "   \n");
-        $printer->text("Disc:             " . str_pad(number_format($discount, 2), 10, ' ', STR_PAD_LEFT) . "   \n");
-        $printer->text("Net Total:        " . str_pad(number_format($netTotal, 2), 10, ' ', STR_PAD_LEFT) . "   \n\n");
-        $printer->setEmphasis(false); // Unbold
-
-        // Footer (No bold, but keep regular text)
-        $printer->setTextSize(1, 1); // Ensure normal font size
-        $printer->setJustification(Printer::JUSTIFY_CENTER);
-        $printer->text("MEDICINE NOT RETURNABLE ON SUNDAY\n");
-        $printer->text("OPEN MEDICINE NOT RETURNABLE\n");
-        $printer->text("RETURN TIMING: 10 AM TO 6 PM FRIDAY\n");
-        $printer->text("FRIDGE ITEM NOT RETURNABLE.\n\n\n");
-
-
-        $printer->cut();
-        $printer->close();
-
-        return response()->json(['success' => true, 'message' => 'Receipt sent to printer.']);
-    } catch (\Exception $e) {
-        return response()->json(['success' => false, 'message' => 'Printing failed: ' . $e->getMessage()]);
+    public function preview(Bill $bill)
+    {
+        $bill->load(['medicalStore', 'patient', 'billDetails.medicine']);
+        return view('bills.preview', compact('bill'));
     }
-}
 
+    public function print(Bill $bill)
+    {
+        $bill->load(['medicalStore', 'patient', 'billDetails.medicine']);
+        $store = $bill->medicalStore;
+
+        try {
+            $connector = new FilePrintConnector("/dev/usb/lp1"); // adjust device path if needed
+            $printer = new Printer($connector);
+
+            // Header - store name
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->setTextSize(2, 2);
+            $printer->setEmphasis(true);
+            $printer->text(($store->name ?? '') . "\n");
+
+            // Header - store details
+            $printer->setTextSize(1, 1);
+            $printer->setEmphasis(false);
+            if (!empty($store->address)) {
+                $printer->text($store->address . "\n");
+            }
+            if (!empty($store->phone)) {
+                $printer->text("Phone # " . $store->phone . "\n");
+            }
+            if (!empty($store->license_no)) {
+                $printer->text("License No: " . $store->license_no . "\n");
+            }
+            $printer->text("\n");
+
+            // Bill meta
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
+            $printer->setEmphasis(true);
+            $printer->text(" No: " . $bill->receipt_no . "    ");
+            $printer->setEmphasis(false);
+            $printer->text("Date: " . \Illuminate\Support\Carbon::parse($bill->date)->format('d/m/Y') . "\n");
+            $printer->text("  M/S: " . (optional($bill->patient)->name ?? '') . "\n\n");
+
+            // Table headers
+            $printer->setEmphasis(true);
+            $printer->text($this->row("Item", "Qty", "Price", "Total"));
+            $printer->setEmphasis(false);
+            $printer->text(str_repeat("-", 42) . "\n");
+
+            // Table rows
+            $grossTotal = 0;
+            foreach ($bill->billDetails as $detail) {
+                $name = optional($detail->medicine)->medicine_name ?? '';
+                $printer->text($this->row(
+                    $name,
+                    (string) $detail->quantity,
+                    number_format($detail->unit_price, 2),
+                    number_format($detail->total_price, 2)
+                ));
+                $grossTotal += $detail->total_price;
+            }
+
+            $printer->text(str_repeat("-", 42) . "\n");
+
+            // Totals
+            $printer->setJustification(Printer::JUSTIFY_RIGHT);
+            $printer->text("Gross Total:      " . str_pad(number_format($grossTotal, 2), 10, ' ', STR_PAD_LEFT) . "   \n");
+            $printer->text("Net Total:        " . str_pad(number_format($grossTotal, 2), 10, ' ', STR_PAD_LEFT) . "   \n\n");
+
+            // Footer - bottom content from store
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            if (!empty($store->bottom_content)) {
+                foreach (preg_split('/\r\n|\r|\n/', $store->bottom_content) as $line) {
+                    $printer->text($line . "\n");
+                }
+            }
+            $printer->text("\n\n");
+
+            $printer->cut();
+            $printer->close();
+
+            return $this->message(true, 'Receipt #' . $bill->receipt_no . ' sent to printer.');
+        } catch (\Exception $e) {
+            return $this->message(false, 'Printing failed: ' . $e->getMessage());
+        }
+    }
+
+    private function row($item, $qty, $price, $total)
+    {
+        return str_pad(mb_substr($item, 0, 20), 20)
+            . str_pad($qty, 4, ' ', STR_PAD_LEFT)
+            . str_pad($price, 9, ' ', STR_PAD_LEFT)
+            . str_pad($total, 9, ' ', STR_PAD_LEFT)
+            . "\n";
+    }
+
+    private function message($success, $text)
+    {
+        $color = $success ? '#16a34a' : '#dc2626';
+        $back = route('bills.index');
+        return response(
+            "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Print</title>"
+            . "<style>body{font-family:sans-serif;padding:40px;text-align:center}"
+            . "a{display:inline-block;margin-top:20px;padding:8px 16px;background:#1f2937;color:#fff;text-decoration:none;border-radius:6px}</style>"
+            . "</head><body><h2 style='color:{$color}'>{$text}</h2>"
+            . "<a href='{$back}'>Back to Bills</a></body></html>"
+        );
+    }
 }

@@ -11,7 +11,7 @@ class BillDetail extends Model
 
     protected $fillable = [
         'bill_id',
-        'medicine_name',
+        'medicine_id',
         'quantity',
         'unit_price',
         'total_price',
@@ -20,5 +20,10 @@ class BillDetail extends Model
     public function bill()
     {
         return $this->belongsTo(Bill::class);
+    }
+
+    public function medicine()
+    {
+        return $this->belongsTo(Medicine::class);
     }
 }

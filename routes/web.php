@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\BillController;
 use App\Http\Controllers\MedicalStoreController;
+use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ReceiptPrintController;
 use Illuminate\Support\Facades\Route;
 
@@ -8,16 +11,16 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('bills.index');
 });
 
 Route::resource('medical_stores', MedicalStoreController::class);
-Route::get('/print-receipt', [ReceiptPrintController::class, 'print'])->name('print.receipt');
+Route::resource('patients', PatientController::class);
+Route::resource('medicines', MedicineController::class);
+Route::resource('bills', BillController::class);
+
+Route::get('/bills/{bill}/preview', [ReceiptPrintController::class, 'preview'])->name('bills.preview');
+Route::get('/bills/{bill}/print', [ReceiptPrintController::class, 'print'])->name('bills.print');
