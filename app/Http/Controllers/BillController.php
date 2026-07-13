@@ -37,6 +37,7 @@ class BillController extends Controller
                 'patient_id' => $data['patient_id'],
                 'receipt_no' => $data['receipt_no'],
                 'date' => $data['date'],
+                'discount' => $data['discount'] ?? 0,
             ]);
             $this->syncDetails($bill, $data['items']);
         });
@@ -71,6 +72,7 @@ class BillController extends Controller
                 'patient_id' => $data['patient_id'],
                 'receipt_no' => $data['receipt_no'],
                 'date' => $data['date'],
+                'discount' => $data['discount'] ?? 0,
             ]);
             $bill->billDetails()->delete();
             $this->syncDetails($bill, $data['items']);
@@ -92,9 +94,11 @@ class BillController extends Controller
             'patient_id' => 'required|exists:patients,id',
             'receipt_no' => 'required|string|max:255',
             'date' => 'required|date',
+            'discount' => 'nullable|numeric|min:0',
             'items' => 'required|array|min:1',
             'items.*.medicine_id' => 'required|exists:medicines,id',
             'items.*.quantity' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
         ]);
     }
 
@@ -103,7 +107,12 @@ class BillController extends Controller
         foreach ($items as $item) {
             $medicine = Medicine::findOrFail($item['medicine_id']);
             $quantity = (int) $item['quantity'];
-            $unitPrice = (float) $medicine->unit_price;
+            $unitPrice = (float) $item['unit_price'];
+
+            // Persist an edited price back to the medicine record.
+            if ((float) $medicine->unit_price !== $unitPrice) {
+                $medicine->update(['unit_price' => $unitPrice]);
+            }
 
             $bill->billDetails()->create([
                 'medicine_id' => $medicine->id,

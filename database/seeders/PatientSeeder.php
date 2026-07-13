@@ -10,11 +10,9 @@ class PatientSeeder extends Seeder
     public function run()
     {
         $patients = [
+            'Saif Ur Rehman',
             'Safia Begum',
-            'Muhammad Ali',
-            'Ayesha Khan',
-            'Bilal Ahmed',
-            'Fatima Noor',
+            'Ghulam Mustafa'
         ];
 
         foreach ($patients as $name) {

@@ -45,6 +45,14 @@
                     <th colspan="3" class="text-end">Gross Total</th>
                     <th class="text-end">{{ number_format($bill->grossTotal(), 2) }}</th>
                 </tr>
+                <tr>
+                    <th colspan="3" class="text-end">Discount</th>
+                    <th class="text-end">{{ number_format($bill->discount, 2) }}</th>
+                </tr>
+                <tr>
+                    <th colspan="3" class="text-end">Net Total</th>
+                    <th class="text-end">{{ number_format($bill->netTotal(), 2) }}</th>
+                </tr>
             </tfoot>
         </table>
         <a href="{{ route('bills.index') }}" class="btn btn-secondary">Back</a>

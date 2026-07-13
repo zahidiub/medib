@@ -73,9 +73,12 @@ class ReceiptPrintController extends Controller
             $printer->text(str_repeat("-", 42) . "\n");
 
             // Totals
+            $discount = (float) $bill->discount;
+            $netTotal = $grossTotal - $discount;
             $printer->setJustification(Printer::JUSTIFY_RIGHT);
             $printer->text("Gross Total:      " . str_pad(number_format($grossTotal, 2), 10, ' ', STR_PAD_LEFT) . "   \n");
-            $printer->text("Net Total:        " . str_pad(number_format($grossTotal, 2), 10, ' ', STR_PAD_LEFT) . "   \n\n");
+            $printer->text("Disc:             " . str_pad(number_format($discount, 2), 10, ' ', STR_PAD_LEFT) . "   \n");
+            $printer->text("Net Total:        " . str_pad(number_format($netTotal, 2), 10, ' ', STR_PAD_LEFT) . "   \n\n");
 
             // Footer - bottom content from store
             $printer->setJustification(Printer::JUSTIFY_CENTER);

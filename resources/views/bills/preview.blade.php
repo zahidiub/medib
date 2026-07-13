@@ -46,7 +46,7 @@
     </style>
 </head>
 <body>
-    @php $store = $bill->medicalStore; $gross = $bill->grossTotal(); @endphp
+    @php $store = $bill->medicalStore; $gross = $bill->grossTotal(); $net = $bill->netTotal(); @endphp
 
     <div class="toolbar">
         <button class="btn btn-print" onclick="window.print()">Print</button>
@@ -101,8 +101,12 @@
                 <td class="num">{{ number_format($gross, 2) }}</td>
             </tr>
             <tr>
+                <td class="label">Discount:</td>
+                <td class="num">{{ number_format($bill->discount, 2) }}</td>
+            </tr>
+            <tr>
                 <td class="label">Net Total:</td>
-                <td class="num">{{ number_format($gross, 2) }}</td>
+                <td class="num">{{ number_format($net, 2) }}</td>
             </tr>
         </table>
 

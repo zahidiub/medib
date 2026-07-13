@@ -10,6 +10,14 @@ class MedicalStoreSeeder extends Seeder
     public function run()
     {
         $stores = [
+            
+            [
+                'name' => 'Rafique Medical Store',
+                'license_no' => '05-352-0064-069265M',
+                'address' => 'Main Al-Mumtaz Road Samanabad Lahore',
+                'phone' => '0323-8430074',
+                'bottom_content' => "NO RETURN WITHOUT RECEIPT\nRETURN TIMING: 10 AM TO 6 PM FRIDAY\nOPEN MEDICINE NOT RETURNABLE. FRIDGE\nITEM NOT RETURNABLE\n\n\n",
+            ],    
             [
                 'name' => 'Green Plus Pharmacie',
                 'license_no' => '05-352-0070-052414P',
@@ -18,12 +26,12 @@ class MedicalStoreSeeder extends Seeder
                 'bottom_content' => "MEDICINE NOT RETURNABLE ON SUNDAY\nOPEN MEDICINE NOT RETURNABLE\nRETURN TIMING: 10 AM TO 6 PM FRIDAY\nFRIDGE ITEM NOT RETURNABLE.",
             ],
             [
-                'name' => 'City Care Pharmacy',
-                'license_no' => '05-100-2233-778899X',
-                'address' => 'Main Boulevard, Gulberg III, Lahore',
-                'phone' => '0300-1122334',
-                'bottom_content' => "NO RETURN WITHOUT RECEIPT\nCHECK MEDICINE BEFORE LEAVING",
-            ],
+                'name' => 'Farooq Plus Pharmacy',
+                'license_no' => '05-352-0064-106323P',
+                'address' => '168-Multan Road Niazi Building Lahore',
+                'phone' => '0323-8415998',
+                'bottom_content' => "MEDICINE NOT RETURNABLE ON SUNDAY\nOPEN MEDICINE NOT RETURNABLE\nRETURN TIMING: 10 AM TO 6 PM FRIDAY\nFRIDGE ITEM NOT RETURNABLE.",
+            ]
         ];
 
         foreach ($stores as $store) {

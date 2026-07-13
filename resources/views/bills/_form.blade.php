@@ -5,9 +5,10 @@
         $items = $bill->billDetails->map(fn($d) => [
             'medicine_id' => $d->medicine_id,
             'quantity' => $d->quantity,
+            'unit_price' => $d->unit_price,
         ])->toArray();
     } else {
-        $items = [['medicine_id' => '', 'quantity' => 1]];
+        $items = [['medicine_id' => '', 'quantity' => 1, 'unit_price' => '']];
     }
 @endphp
 
@@ -49,6 +50,7 @@
 </div>
 
 <h6 class="mt-2">Medicines</h6>
+<p class="text-muted small mb-2">Unit price is loaded from the selected medicine and can be edited. Any change is also saved back to the medicine record.</p>
 <table class="table align-middle" id="items-table">
     <thead>
         <tr>
@@ -74,7 +76,7 @@
                 </select>
             </td>
             <td><input type="number" min="1" name="items[{{ $i }}][quantity]" class="form-control qty-input" value="{{ $item['quantity'] }}" required></td>
-            <td class="unit-price">0.00</td>
+            <td><input type="number" step="0.01" min="0" name="items[{{ $i }}][unit_price]" class="form-control unit-price-input" value="{{ $item['unit_price'] ?? '' }}" required></td>
             <td class="line-total">0.00</td>
             <td><button type="button" class="btn btn-outline-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>
         </tr>
@@ -89,8 +91,22 @@
             </td>
         </tr>
         <tr>
-            <th colspan="3" class="text-end">Gross Total</th>
+            <th colspan="3" class="text-end align-middle">Gross Total</th>
             <th id="gross-total">0.00</th>
+            <th></th>
+        </tr>
+        <tr>
+            <th colspan="3" class="text-end align-middle">Discount</th>
+            <th>
+                <input type="number" step="0.01" min="0" name="discount" id="discount-input"
+                       class="form-control form-control-sm"
+                       value="{{ old('discount', isset($bill) && $bill->exists ? $bill->discount : 0) }}">
+            </th>
+            <th></th>
+        </tr>
+        <tr>
+            <th colspan="3" class="text-end align-middle">Net Total</th>
+            <th id="net-total">0.00</th>
             <th></th>
         </tr>
     </tfoot>
@@ -107,7 +123,7 @@
             </select>
         </td>
         <td><input type="number" min="1" name="items[__INDEX__][quantity]" class="form-control qty-input" value="1" required></td>
-        <td class="unit-price">0.00</td>
+        <td><input type="number" step="0.01" min="0" name="items[__INDEX__][unit_price]" class="form-control unit-price-input" value="" required></td>
         <td class="line-total">0.00</td>
         <td><button type="button" class="btn btn-outline-danger btn-sm remove-row"><i class="bi bi-trash"></i></button></td>
     </tr>

@@ -14,6 +14,7 @@ class Bill extends Model
         'patient_id',
         'receipt_no',
         'date',
+        'discount',
     ];
 
     public function billDetails()
@@ -34,5 +35,10 @@ class Bill extends Model
     public function grossTotal()
     {
         return $this->billDetails->sum('total_price');
+    }
+
+    public function netTotal()
+    {
+        return $this->grossTotal() - (float) $this->discount;
     }
 }
