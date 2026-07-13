@@ -7,10 +7,17 @@ use Illuminate\Http\Request;
 
 class MedicineController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $medicines = Medicine::latest()->get();
-        return view('medicines.index', compact('medicines'));
+        $search = $request->input('search');
+
+        $medicines = Medicine::when($search, function ($query, $search) {
+                $query->where('medicine_name', 'like', '%' . $search . '%');
+            })
+            ->latest()
+            ->get();
+
+        return view('medicines.index', compact('medicines', 'search'));
     }
 
     public function create()

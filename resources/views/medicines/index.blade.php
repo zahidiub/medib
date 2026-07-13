@@ -10,6 +10,18 @@
                 <i class="bi bi-plus-lg"></i> Add Medicine
             </a>
         </div>
+        <form action="{{ route('medicines.index') }}" method="GET" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Search medicine name..."
+                       value="{{ $search ?? '' }}">
+                <button class="btn btn-outline-secondary" type="submit">
+                    <i class="bi bi-search"></i> Search
+                </button>
+                @if(!empty($search))
+                    <a href="{{ route('medicines.index') }}" class="btn btn-outline-danger">Clear</a>
+                @endif
+            </div>
+        </form>
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead>
@@ -35,7 +47,9 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="4" class="text-center text-muted py-4">No medicines yet.</td></tr>
+                    <tr><td colspan="4" class="text-center text-muted py-4">
+                        {{ !empty($search) ? 'No medicines match "'.$search.'".' : 'No medicines yet.' }}
+                    </td></tr>
                     @endforelse
                 </tbody>
             </table>
