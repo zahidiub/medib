@@ -3,6 +3,10 @@
     <input type="text" name="name" class="form-control" value="{{ old('name', $medicalStore->name ?? '') }}" required>
 </div>
 <div class="mb-3">
+    <label class="form-label">Sub Name</label>
+    <input type="text" name="sub_name" class="form-control" value="{{ old('sub_name', $medicalStore->sub_name ?? '') }}">
+</div>
+<div class="mb-3">
     <label class="form-label">License No</label>
     <input type="text" name="license_no" class="form-control" value="{{ old('license_no', $medicalStore->license_no ?? '') }}">
 </div>

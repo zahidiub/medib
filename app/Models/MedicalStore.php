@@ -11,6 +11,7 @@ class MedicalStore extends Model
 
     protected $fillable = [
         'name',
+        'sub_name',
         'license_no',
         'address',
         'phone',

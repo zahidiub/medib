@@ -13,6 +13,7 @@ class MedicalStoreSeeder extends Seeder
             
             [
                 'name' => 'Rafique Medical Store',
+                'sub_name' => '',
                 'license_no' => '05-352-0064-069265M',
                 'address' => 'Main Al-Mumtaz Road Samanabad Lahore',
                 'phone' => '0323-8430074',
@@ -20,6 +21,7 @@ class MedicalStoreSeeder extends Seeder
             ],    
             [
                 'name' => 'Green Plus Pharmacie',
+                'sub_name' => '',
                 'license_no' => '05-352-0070-052414P',
                 'address' => 'Shop# 3, Chiragh Din Market, Opp. Valencia Gate # 8, Defence Road, Lahore',
                 'phone' => '0321-4638248',
@@ -27,9 +29,18 @@ class MedicalStoreSeeder extends Seeder
             ],
             [
                 'name' => 'Farooq Plus Pharmacy',
+                'sub_name' => '',
                 'license_no' => '05-352-0064-106323P',
                 'address' => '168-Multan Road Niazi Building Lahore',
                 'phone' => '0323-8415998',
+                'bottom_content' => "MEDICINE NOT RETURNABLE ON SUNDAY\nOPEN MEDICINE NOT RETURNABLE\nRETURN TIMING: 10 AM TO 6 PM FRIDAY\nFRIDGE ITEM NOT RETURNABLE.",
+            ],
+            [
+                'name' => 'Rainbow',
+                'sub_name' => 'Cash & Carry Pharmacy',
+                'license_no' => '2110-A/99',
+                'address' => 'Main Canal, West Bank Road, Near EME DHA Sector Lahore',
+                'phone' => '.42-35971775',
                 'bottom_content' => "MEDICINE NOT RETURNABLE ON SUNDAY\nOPEN MEDICINE NOT RETURNABLE\nRETURN TIMING: 10 AM TO 6 PM FRIDAY\nFRIDGE ITEM NOT RETURNABLE.",
             ]
         ];

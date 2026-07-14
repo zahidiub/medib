@@ -57,6 +57,7 @@
     <div class="receipt">
         <div class="center">
             <div class="store-name">{{ $store->name ?? '' }}</div>
+            @if(!empty($store->sub_name))<div class="muted">{{ $store->sub_name }}</div>@endif
             @if(!empty($store->address))<div class="muted">{{ $store->address }}</div>@endif
             @if(!empty($store->phone))<div class="muted">Phone # {{ $store->phone }}</div>@endif
             @if(!empty($store->license_no))<div class="muted">License No: {{ $store->license_no }}</div>@endif

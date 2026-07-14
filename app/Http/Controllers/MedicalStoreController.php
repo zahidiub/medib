@@ -52,6 +52,7 @@ class MedicalStoreController extends Controller
     {
         return $request->validate([
             'name' => 'required|string|max:255',
+            'sub_name' => 'nullable|string|max:255',
             'license_no' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:255',

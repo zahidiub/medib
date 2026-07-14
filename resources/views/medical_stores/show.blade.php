@@ -6,6 +6,7 @@
     <div class="card-body">
         <ul class="list-group list-group-flush">
             <li class="list-group-item"><strong>Name:</strong> {{ $medicalStore->name }}</li>
+            <li class="list-group-item"><strong>Sub Name:</strong> {{ $medicalStore->sub_name }}</li>
             <li class="list-group-item"><strong>License No:</strong> {{ $medicalStore->license_no }}</li>
             <li class="list-group-item"><strong>Address:</strong> {{ $medicalStore->address }}</li>
             <li class="list-group-item"><strong>Phone:</strong> {{ $medicalStore->phone }}</li>

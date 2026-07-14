@@ -32,6 +32,9 @@ class ReceiptPrintController extends Controller
             // Header - store details
             $printer->setTextSize(1, 1);
             $printer->setEmphasis(false);
+            if (!empty($store->sub_name)) {
+                $printer->text($store->sub_name . "\n");
+            }
             if (!empty($store->address)) {
                 $printer->text($store->address . "\n");
             }
