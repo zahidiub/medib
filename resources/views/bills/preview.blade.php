@@ -30,9 +30,11 @@
         .muted { font-size:11px; }
         .divider { border:none; border-top:1px dashed #000; margin:6px 0; }
         table { width:100%; border-collapse:collapse; font-size:11px; }
-        th, td { padding:1px 0; }
+        th, td { padding:1px 2px; vertical-align:top; }
         th { text-align:left; border-bottom:1px solid #000; }
-        .num { text-align:right; white-space:nowrap; }
+        td:first-child, th:first-child { padding-left:0; word-break:break-word; }
+        td:last-child, th:last-child { padding-right:0; }
+        .num { text-align:right; white-space:nowrap; padding-left:8px; }
         .totals td { padding-top:2px; }
         .totals .label { text-align:right; font-weight:700; }
         .footer { font-size:11px; white-space:pre-line; }

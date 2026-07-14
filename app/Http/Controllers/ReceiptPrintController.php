@@ -103,11 +103,16 @@ class ReceiptPrintController extends Controller
 
     private function row($item, $qty, $price, $total)
     {
-        return str_pad(mb_substr($item, 0, 20), 20)
-            . str_pad($qty, 4, ' ', STR_PAD_LEFT)
-            . str_pad($price, 9, ' ', STR_PAD_LEFT)
-            . str_pad($total, 9, ' ', STR_PAD_LEFT)
-            . "\n";
+        // Column widths (14 + 3 + 10 + 12) plus 3 single-space separators = 42 chars.
+        // A literal space between each column guarantees a gap even when a value
+        // (e.g. a 6-digit price) is wider than its allotted column.
+        return sprintf(
+            "%-14.14s %3s %10s %12s\n",
+            mb_substr($item, 0, 14),
+            $qty,
+            $price,
+            $total
+        );
     }
 
     private function message($success, $text)
