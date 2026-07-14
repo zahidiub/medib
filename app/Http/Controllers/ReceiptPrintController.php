@@ -52,7 +52,7 @@ class ReceiptPrintController extends Controller
             $printer->text(" No: " . $bill->receipt_no . "    ");
             $printer->setEmphasis(false);
             $printer->text("Date: " . \Illuminate\Support\Carbon::parse($bill->date)->format('d/m/Y') . "\n");
-            $printer->text("  M/S: " . (optional($bill->patient)->name ?? '') . "\n\n");
+            $printer->text(" M/S: " . (optional($bill->patient)->name ?? '') . "\n\n");
 
             // Table headers
             $printer->setJustification(Printer::JUSTIFY_CENTER);
