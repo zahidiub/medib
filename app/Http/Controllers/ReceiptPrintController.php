@@ -107,13 +107,59 @@ class ReceiptPrintController extends Controller
         // Column widths (14 + 3 + 10 + 12) plus 3 single-space separators = 42 chars.
         // A literal space between each column guarantees a gap even when a value
         // (e.g. a 6-digit price) is wider than its allotted column.
-        return sprintf(
+        // Long item names wrap onto additional lines (matching the print preview)
+        // instead of being truncated. Only the first line carries qty/price/total.
+        $lines = $this->wrapText($item, 14);
+
+        $out = sprintf(
             "%-14.14s %3s %10s %12s\n",
-            mb_substr($item, 0, 14),
+            array_shift($lines),
             $qty,
             $price,
             $total
         );
+
+        foreach ($lines as $line) {
+            // Pad to the full 42-char row width so the continuation aligns under
+            // the item column even though rows are printed center-justified.
+            // A 2-space indent visually ties wrapped text to the line above.
+            $out .= sprintf("%-42.42s\n", "    " . $line);
+        }
+
+        return $out;
+    }
+
+    private function wrapText($text, $width)
+    {
+        $text = trim((string) $text);
+        if ($text === '') {
+            return [''];
+        }
+
+        $lines = [];
+        foreach (preg_split('/\s+/', $text) as $word) {
+            // Break words that are longer than the column width.
+            while (mb_strlen($word) > $width) {
+                $lines[] = mb_substr($word, 0, $width);
+                $word = mb_substr($word, $width);
+            }
+
+            if (empty($lines)) {
+                $lines[] = $word;
+                continue;
+            }
+
+            $last = array_pop($lines);
+            $candidate = $last === '' ? $word : $last . ' ' . $word;
+            if (mb_strlen($candidate) <= $width) {
+                $lines[] = $candidate;
+            } else {
+                $lines[] = $last;
+                $lines[] = $word;
+            }
+        }
+
+        return empty($lines) ? [''] : $lines;
     }
 
     private function message($success, $text)
