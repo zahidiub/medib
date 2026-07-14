@@ -55,6 +55,7 @@ class ReceiptPrintController extends Controller
             $printer->text("  M/S: " . (optional($bill->patient)->name ?? '') . "\n\n");
 
             // Table headers
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->setEmphasis(true);
             $printer->text($this->row("Item", "Qty", "Price", "Total"));
             $printer->setEmphasis(false);
