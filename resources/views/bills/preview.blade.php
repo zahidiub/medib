@@ -21,35 +21,30 @@
         .btn-back { background:#6b7280; }
 
         .receipt {
-            width:302px; background:#fff; padding:16px 14px;
+            background:#fff; padding:16px 14px;
             box-shadow:0 2px 10px rgba(0,0,0,.15);
-            font-family: 'Courier New', monospace; color:#000; font-size:12px; line-height:1.45;
         }
-        .center { text-align:center; }
-        .store-name { font-size:18px; font-weight:700; }
-        .muted { font-size:11px; }
-        .divider { border:none; border-top:1px dashed #000; margin:6px 0; }
-        table { width:100%; border-collapse:collapse; font-size:11px; }
-        th, td { padding:1px 2px; vertical-align:top; }
-        th { text-align:left; border-bottom:1px solid #000; }
-        td:first-child, th:first-child { padding-left:0; word-break:break-word; }
-        td:last-child, th:last-child { padding-right:0; }
-        .num { text-align:right; white-space:nowrap; padding-left:8px; }
-        .totals td { padding-top:2px; }
-        .totals .label { text-align:right; font-weight:700; }
-        .footer { font-size:11px; white-space:pre-line; }
-        .meta { display:flex; justify-content:space-between; font-size:11px; }
+        /* Render the exact 42-char monospace text the printer receives.
+           ch units tie the width to the character grid so wrapping/columns match. */
+        .paper {
+            font-family: 'Courier New', monospace;
+            font-size:13px;
+            line-height:1.35;
+            white-space:pre;
+            color:#000;
+            width:42ch;
+            margin:0;
+        }
+        .paper b { font-weight:700; }
 
         @media print {
             body { background:#fff; padding:0; }
             .toolbar { display:none; }
-            .receipt { box-shadow:none; width:80mm; padding:0; }
+            .receipt { box-shadow:none; padding:0; }
         }
     </style>
 </head>
 <body>
-    @php $store = $bill->medicalStore; $gross = $bill->grossTotal(); $net = $bill->netTotal(); @endphp
-
     <div class="toolbar">
         <button class="btn btn-print" onclick="window.print()">Print</button>
         <a class="btn btn-thermal" href="{{ route('bills.print', $bill) }}">Send to Thermal Printer</a>
@@ -57,66 +52,7 @@
     </div>
 
     <div class="receipt">
-        <div class="center">
-            <div class="store-name">{{ $store->name ?? '' }}</div>
-            @if(!empty($store->sub_name))<div class="muted">{{ $store->sub_name }}</div>@endif
-            @if(!empty($store->address))<div class="muted">{{ $store->address }}</div>@endif
-            @if(!empty($store->phone))<div class="muted">Phone # {{ $store->phone }}</div>@endif
-            @if(!empty($store->license_no))<div class="muted">License No: {{ $store->license_no }}</div>@endif
-        </div>
-
-        <hr class="divider">
-
-        <div class="meta">
-            <span><strong>No:</strong> {{ $bill->receipt_no }}</span>
-            <span><strong>Date:</strong> {{ \Illuminate\Support\Carbon::parse($bill->date)->format('d/m/Y') }}</span>
-        </div>
-        <div><strong>M/S:</strong> {{ optional($bill->patient)->name }}</div>
-
-        <hr class="divider">
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th class="num">Qty</th>
-                    <th class="num">Price</th>
-                    <th class="num">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($bill->billDetails as $detail)
-                <tr>
-                    <td>{{ optional($detail->medicine)->medicine_name }}</td>
-                    <td class="num">{{ $detail->quantity }}</td>
-                    <td class="num">{{ number_format($detail->unit_price, 2) }}</td>
-                    <td class="num">{{ number_format($detail->total_price, 2) }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <hr class="divider">
-
-        <table class="totals">
-            <tr>
-                <td class="label">Gross Total:</td>
-                <td class="num">{{ number_format($gross, 2) }}</td>
-            </tr>
-            <tr>
-                <td class="label">Discount:</td>
-                <td class="num">{{ number_format($bill->discount, 2) }}</td>
-            </tr>
-            <tr>
-                <td class="label">Net Total:</td>
-                <td class="num">{{ number_format($net, 2) }}</td>
-            </tr>
-        </table>
-
-        @if(!empty($store->bottom_content))
-            <hr class="divider">
-            <div class="center footer">{{ $store->bottom_content }}</div>
-        @endif
+<pre class="paper">{!! collect($lines)->map(fn ($l) => $l['bold'] ? '<b>' . e($l['text']) . '</b>' : e($l['text']))->implode("\n") !!}</pre>
     </div>
 </body>
 </html>
