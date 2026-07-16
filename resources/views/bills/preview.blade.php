@@ -35,12 +35,13 @@
             margin:0;
         }
         .paper .ln { white-space:pre; }
+        .paper .center { white-space:normal; text-align:center; }
         .paper .bold { font-weight:700; }
         .paper .big {
             white-space:normal;
             text-align:center;
             font-size:18px;
-            font-weight:700;
+            font-weight:900;
             line-height:1.2;
             margin:2px 0 4px;
         }
@@ -64,6 +65,7 @@
             @foreach($lines as $line)
                 @php
                     $cls = !empty($line['big']) ? 'big' : (!empty($line['bold']) ? 'ln bold' : 'ln');
+                    if (($line['align'] ?? 'left') === 'center') { $cls .= ' center'; }
                     $content = $line['text'] === '' ? '&nbsp;' : e($line['text']);
                 @endphp
                 <div class="{{ $cls }}">{!! $content !!}</div>

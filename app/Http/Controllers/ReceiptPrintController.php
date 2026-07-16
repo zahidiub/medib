@@ -36,14 +36,18 @@ class ReceiptPrintController extends Controller
                 if (!empty($line['big'])) {
                     // Store name: medium (double height), bold, centered by the printer.
                     $printer->setJustification(Printer::JUSTIFY_CENTER);
-                    $printer->setTextSize(1, 2);
+                    $printer->setTextSize(2, 2);
                     $printer->setEmphasis(true);
                     $printer->text($line['text'] . "\n");
                     $printer->setTextSize(1, 1);
                     $printer->setEmphasis(false);
-                    $printer->setJustification(Printer::JUSTIFY_LEFT);
                     continue;
                 }
+                // Center every line on the paper. The body lines are all exactly
+                // WIDTH characters wide, so centering shifts them as a single block
+                // and gives equal margins on both sides while keeping the columns
+                // aligned. Header/footer lines are shorter and get centered too.
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
                 $printer->setEmphasis(!empty($line['bold']));
                 $printer->text($line['text'] . "\n");
             }
@@ -75,16 +79,16 @@ class ReceiptPrintController extends Controller
         // printer can center it at double size and the preview can center it via CSS.
         $lines[] = $this->line($store->name ?? '', true, true);
         if (!empty($store->sub_name)) {
-            $lines[] = $this->line($this->center($store->sub_name));
+            $lines[] = $this->line($store->sub_name, false, false, 'center');
         }
         if (!empty($store->address)) {
-            $lines[] = $this->line($this->center($store->address));
+            $lines[] = $this->line($store->address, false, false, 'center');
         }
         if (!empty($store->phone)) {
-            $lines[] = $this->line($this->center("Phone # " . $store->phone));
+            $lines[] = $this->line("Phone # " . $store->phone, false, false, 'center');
         }
         if (!empty($store->license_no)) {
-            $lines[] = $this->line($this->center("License No: " . $store->license_no));
+            $lines[] = $this->line("License No: " . $store->license_no, false, false, 'center');
         }
         $lines[] = $this->line('');
 
@@ -92,7 +96,7 @@ class ReceiptPrintController extends Controller
         $left = "No: " . $bill->receipt_no;
         $right = "Date: " . Carbon::parse($bill->date)->format('d/m/Y');
         $lines[] = $this->line($this->leftRight($left, $right), true);
-        $lines[] = $this->line("M/S: " . (optional($bill->patient)->name ?? ''));
+        $lines[] = $this->line($this->padRight("M/S: " . (optional($bill->patient)->name ?? '')));
         $lines[] = $this->line('');
 
         // Table header
@@ -128,23 +132,26 @@ class ReceiptPrintController extends Controller
         if (!empty($store->bottom_content)) {
             $lines[] = $this->line('');
             foreach (preg_split('/\r\n|\r|\n/', $store->bottom_content) as $footer) {
-                $lines[] = $this->line($this->center($footer));
+                $lines[] = $this->line($footer, false, false, 'center');
             }
         }
 
         return $lines;
     }
 
-    private function line($text, $bold = false, $big = false): array
+    private function line($text, $bold = false, $big = false, $align = 'left'): array
     {
-        return ['text' => $text, 'bold' => $bold, 'big' => $big];
+        return ['text' => $text, 'bold' => $bold, 'big' => $big, 'align' => $align];
     }
 
-    private function center($text): string
+    private function padRight($text): string
     {
-        $text = mb_substr((string) $text, 0, self::WIDTH);
-        $pad = intdiv(self::WIDTH - mb_strlen($text), 2);
-        return str_repeat(' ', max(0, $pad)) . $text;
+        $text = (string) $text;
+        $len = mb_strlen($text);
+        if ($len >= self::WIDTH) {
+            return mb_substr($text, 0, self::WIDTH);
+        }
+        return $text . str_repeat(' ', self::WIDTH - $len);
     }
 
     private function leftRight($left, $right): string
@@ -174,7 +181,9 @@ class ReceiptPrintController extends Controller
         $out[] = sprintf("%-18.18s %3s %8s %10s", array_shift($wrapped), $qty, $price, $total);
 
         foreach ($wrapped as $line) {
-            $out[] = " " . $line;
+            // Pad to full width so continuation lines shift with the rest of the
+            // centered block instead of being centered on their own.
+            $out[] = $this->padRight(" " . $line);
         }
 
         return $out;
