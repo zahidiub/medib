@@ -33,6 +33,17 @@ class ReceiptPrintController extends Controller
             $printer->setTextSize(1, 1);
 
             foreach ($lines as $line) {
+                if (!empty($line['big'])) {
+                    // Store name: medium (double height), bold, centered by the printer.
+                    $printer->setJustification(Printer::JUSTIFY_CENTER);
+                    $printer->setTextSize(1, 2);
+                    $printer->setEmphasis(true);
+                    $printer->text($line['text'] . "\n");
+                    $printer->setTextSize(1, 1);
+                    $printer->setEmphasis(false);
+                    $printer->setJustification(Printer::JUSTIFY_LEFT);
+                    continue;
+                }
                 $printer->setEmphasis(!empty($line['bold']));
                 $printer->text($line['text'] . "\n");
             }
@@ -60,8 +71,9 @@ class ReceiptPrintController extends Controller
 
         $lines = [];
 
-        // Header - store info (centered)
-        $lines[] = $this->line($this->center($store->name ?? ''), true);
+        // Header - store name (large + bold, centered). Stored raw (unpadded) so the
+        // printer can center it at double size and the preview can center it via CSS.
+        $lines[] = $this->line($store->name ?? '', true, true);
         if (!empty($store->sub_name)) {
             $lines[] = $this->line($this->center($store->sub_name));
         }
@@ -123,9 +135,9 @@ class ReceiptPrintController extends Controller
         return $lines;
     }
 
-    private function line($text, $bold = false): array
+    private function line($text, $bold = false, $big = false): array
     {
-        return ['text' => $text, 'bold' => $bold];
+        return ['text' => $text, 'bold' => $bold, 'big' => $big];
     }
 
     private function center($text): string

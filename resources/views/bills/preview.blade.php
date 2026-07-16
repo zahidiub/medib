@@ -30,12 +30,20 @@
             font-family: 'Courier New', monospace;
             font-size:13px;
             line-height:1.35;
-            white-space:pre;
             color:#000;
             width:42ch;
             margin:0;
         }
-        .paper b { font-weight:700; }
+        .paper .ln { white-space:pre; }
+        .paper .bold { font-weight:700; }
+        .paper .big {
+            white-space:normal;
+            text-align:center;
+            font-size:18px;
+            font-weight:700;
+            line-height:1.2;
+            margin:2px 0 4px;
+        }
 
         @media print {
             body { background:#fff; padding:0; }
@@ -52,7 +60,15 @@
     </div>
 
     <div class="receipt">
-<pre class="paper">{!! collect($lines)->map(fn ($l) => $l['bold'] ? '<b>' . e($l['text']) . '</b>' : e($l['text']))->implode("\n") !!}</pre>
+        <div class="paper">
+            @foreach($lines as $line)
+                @php
+                    $cls = !empty($line['big']) ? 'big' : (!empty($line['bold']) ? 'ln bold' : 'ln');
+                    $content = $line['text'] === '' ? '&nbsp;' : e($line['text']);
+                @endphp
+                <div class="{{ $cls }}">{!! $content !!}</div>
+            @endforeach
+        </div>
     </div>
 </body>
 </html>
